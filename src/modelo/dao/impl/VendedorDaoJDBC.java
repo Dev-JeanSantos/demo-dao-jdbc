@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,8 +26,45 @@ public class VendedorDaoJDBC implements VendedorDao {
 
 	@Override
 	public void inserir(Vendedor obj) {
-		// TODO Auto-generated method stub
 		
+		PreparedStatement st = null;
+		try {
+			
+			st = conn.prepareStatement(
+					"INSERT INTO vendedor "
+					+ "( nome, email, dataNascimento, salario, departamentoid )"
+					+ "VALUES "
+					+ " (?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
+			st.setString(1, obj.getNome());
+			st.setString(2, obj.getEmail());
+			st.setDate(3,new java.sql.Date (obj.getDataNascimento().getTime()));
+			st.setDouble(4, obj.getSalario());
+			st.setInt(5,obj.getDepartamento().getId());
+			
+			int add = st.executeUpdate();
+			
+			if (add > 0) {
+				
+				ResultSet rs = st.getGeneratedKeys();
+				if (rs.next()) {
+					int id = rs.getInt(1);
+					obj.setId(id);
+				}
+				
+				DB.closeResultaSet(rs);
+				
+			}
+			else {
+				
+				throw new DbException("Nenhuma Linha foi Alterada");
+			}
+			
+		} catch (SQLException e) {
+			throw new DbException(e.getMessage());
+		}
+		finally {
+			DB.closeStatement(st);			
+		}
 	}
 
 	@Override
