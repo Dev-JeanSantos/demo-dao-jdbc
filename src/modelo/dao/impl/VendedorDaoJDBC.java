@@ -4,7 +4,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import db.DB;
 import db.DbException;
@@ -79,6 +82,12 @@ public class VendedorDaoJDBC implements VendedorDao {
 		}
 	}
 	
+	@Override
+	public List<Vendedor> buscarTodos() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
 	//Metodo que instancia um Vendedor (reuso)
 	private Vendedor instanciacaoVendedor(ResultSet rs, Departamento dep) throws SQLException {
 		
@@ -104,9 +113,64 @@ public class VendedorDaoJDBC implements VendedorDao {
 	}
 
 	@Override
-	public List<Vendedor> buscarTodos() {
-		// TODO Auto-generated method stub
-		return null;
+	public List<Vendedor> buscarPorDepartamento(Departamento departamento) {
+		
+		PreparedStatement st = null;
+		ResultSet rs = null;
+		
+		try {
+			
+			st = conn.prepareStatement(
+					"SELECT vendedor.* "
+					+ " ,departamento.nome as depNome "
+					+ " FROM vendedor INNER JOIN departamento "
+					+ "	ON vendedor.departamentoid = departamento.id "
+					+ "	WHERE departamentoid = ? "
+					+ "ORDER BY nome;");
+			
+			st.setInt(1,departamento.getId());//Entrada do vendedorId a pesquisar na consulta atraves "?"
+			rs = st.executeQuery();//execução da query retornando para resultset
+			
+			List<Vendedor> list = new ArrayList<Vendedor>();
+			Map<Integer, Departamento> map = new HashMap<Integer, Departamento>();
+			
+			while (rs.next()) { //condição de busca ate encontrar o ultimo dado no banco
+				
+				Departamento dep = map.get(rs.getInt("departamentoid"));
+				
+				if (dep == null) {
+					
+					dep = instanciacaoDepartamento(rs);
+					map.put(rs.getInt("departamentoid"), dep);
+				}
+				
+			//Metodo para chamada de departamento instanciado
+							
+				Vendedor obj = instanciacaoVendedor(rs, dep);
+				
+				list.add(obj);
+		}
+			return list; 
 	}
+	catch (SQLException e) {
+		throw new DbException(e.getMessage());
+	}
+	
+	finally {
+		
+		DB.closeStatement(st);
+		DB.closeResultaSet(rs);
+		//não há necessidade de fechar a conexão pois outro metodos podem utiliza-lá
+	}
+		
+}
+
+
+	
+	/* SELECT vendedor.*,departamento.nome as DepName
+FROM vendedor INNER JOIN departamento
+ON vendedor.departamentoid = departamento.id
+WHERE departamentoid = 1
+ORDER BY nome;*/
 	
 }
