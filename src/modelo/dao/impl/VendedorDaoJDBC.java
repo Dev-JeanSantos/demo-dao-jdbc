@@ -57,19 +57,10 @@ public class VendedorDaoJDBC implements VendedorDao {
 			st.setInt(1,id);//Entrada do vendedorId a pesquisar na consulta atraves "?"
 			rs = st.executeQuery();//execução da query retornando para resultset
 			if (rs.next()) { //condição de busca ate encontrar o ultimo dado no banco
-				
-								
-				Departamento dep = new Departamento();//instanciando um Objeto Departamento
-				dep.setId(rs.getInt("departamentoid"));//Setando a Variavel setId com o resultado deparatamentoId
-				dep.setNome(rs.getString("depNome")); //Setando a Variavel setNome com o resultado deparatamentoNome
-				
-				Vendedor obj = new Vendedor();//instanciando um Objeto Vendedor
-				obj.setId(rs.getInt("id"));//Setando a Variavel setId com o resultado vendedorId
-				obj.setNome(rs.getString("nome"));//Setando a Variavel setNome com o resultado vendedorNome
-				obj.setEmail(rs.getString("email"));//Setando a Variavel setEmail com o resultado vendedorEmail
-				obj.setDataNascimento(rs.getDate("dataNascimento"));
-				obj.setSalario(rs.getDouble("salario"));
-				obj.setDepartamento(dep);//Associando o objeto departamento ao vendedor
+												
+				Departamento dep = instanciacaoDepartamento(rs);//Metodo para chamada de departamento instanciado
+							
+				Vendedor obj = instanciacaoVendedor(rs, dep);
 				
 				return obj;//retorna o objeto completo
 			}
@@ -86,6 +77,30 @@ public class VendedorDaoJDBC implements VendedorDao {
 			DB.closeResultaSet(rs);
 			//não há necessidade de fechar a conexão pois outro metodos podem utiliza-lá
 		}
+	}
+	
+	//Metodo que instancia um Vendedor (reuso)
+	private Vendedor instanciacaoVendedor(ResultSet rs, Departamento dep) throws SQLException {
+		
+		Vendedor obj = new Vendedor();//instanciando um Objeto Vendedor
+		obj.setId(rs.getInt("id"));//Setando a Variavel setId com o resultado vendedorId
+		obj.setNome(rs.getString("nome"));//Setando a Variavel setNome com o resultado vendedorNome
+		obj.setEmail(rs.getString("email"));//Setando a Variavel setEmail com o resultado vendedorEmail
+		obj.setDataNascimento(rs.getDate("dataNascimento"));
+		obj.setSalario(rs.getDouble("salario"));
+		obj.setDepartamento(dep);//Associando o objeto departamento ao vendedor
+		
+		return obj;
+		
+	}
+
+	//Metodo que instancia um Departamento (reuso)
+	private Departamento instanciacaoDepartamento(ResultSet rs) throws SQLException {
+		Departamento dep = new Departamento();//instanciando um Objeto Departamento
+		dep.setId(rs.getInt("departamentoid"));//Setando a Variavel setId com o resultado deparatamentoId
+		dep.setNome(rs.getString("depNome")); //Setando a Variavel setNome com o resultado deparatamentoNome
+		
+		return dep;
 	}
 
 	@Override
