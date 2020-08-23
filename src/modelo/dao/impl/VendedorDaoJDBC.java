@@ -84,8 +84,51 @@ public class VendedorDaoJDBC implements VendedorDao {
 	
 	@Override
 	public List<Vendedor> buscarTodos() {
-		// TODO Auto-generated method stub
-		return null;
+		
+		PreparedStatement st = null;
+		ResultSet rs = null;
+		
+		try {
+			
+			st = conn.prepareStatement(" SELECT vendedor.*, departamento.nome AS depNome "
+					+ "FROM vendedor INNER JOIN departamento "
+					+ "ON vendedor.departamentoid = departamento.id "
+					+ "ORDER BY nome;");
+			
+			
+			rs = st.executeQuery();//execução da query retornando para resultset
+			
+			List<Vendedor> list = new ArrayList<Vendedor>();
+			Map<Integer, Departamento> map = new HashMap<Integer, Departamento>();
+			
+			while (rs.next()) { //condição de busca ate encontrar o ultimo dado no banco
+				
+				Departamento dep = map.get(rs.getInt("departamentoid"));
+				
+				if (dep == null) {
+					
+					dep = instanciacaoDepartamento(rs);
+					map.put(rs.getInt("departamentoid"), dep);
+				}
+				
+			//Metodo para chamada de departamento instanciado
+							
+				Vendedor obj = instanciacaoVendedor(rs, dep);
+				
+				list.add(obj);
+		}
+			return list; 
+	}
+	catch (SQLException e) {
+		throw new DbException(e.getMessage());
+	}
+	
+	finally {
+		
+		DB.closeStatement(st);
+		DB.closeResultaSet(rs);
+		//não há necessidade de fechar a conexão pois outro metodos podem utiliza-lá
+	}
 	}
 	
 	//Metodo que instancia um Vendedor (reuso)
