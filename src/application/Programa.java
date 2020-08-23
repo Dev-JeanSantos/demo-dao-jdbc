@@ -2,6 +2,9 @@ package application;
 
 import java.util.Date;
 
+import modelo.dao.DaoFabrica;
+import modelo.dao.VendedorDao;
+import modelo.dao.impl.VendedorDaoJDBC;
 import modelo.entidades.Departamento;
 import modelo.entidades.Vendedor;
 
@@ -15,6 +18,8 @@ public class Programa {
 		Vendedor ven = new Vendedor(1, "Jean Santos", "jeancbsan@gmail.com",
 				new Date() , 4400.00 , dep);		
 		System.out.println(ven);
+		
+		VendedorDao vendedorDao = DaoFabrica.inserirVendedorDao();
 	}
 
 }
