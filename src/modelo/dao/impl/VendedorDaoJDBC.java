@@ -69,13 +69,59 @@ public class VendedorDaoJDBC implements VendedorDao {
 
 	@Override
 	public void update(Vendedor obj) {
-		// TODO Auto-generated method stub
 		
+		PreparedStatement st = null;
+		
+		//, email = ?, dataNascimento = ?, salario = ?, departamentoid =?
+		
+		
+		try {
+			
+			st = conn.prepareStatement(
+					"UPDATE  vendedor "
+					+ " SET nome = ? "
+					+ "WHERE id = ? ");
+			st.setString(1, obj.getNome());
+			/*st.setString(2, obj.getEmail());
+			st.setDate(3,new java.sql.Date (obj.getDataNascimento().getTime()));
+			st.setDouble(4, obj.getSalario());
+			st.setInt(5,obj.getDepartamento().getId());*/
+			st.setInt(2, obj.getId());
+			
+			st.executeUpdate();
+						
+		} catch (SQLException e) {
+			throw new DbException(e.getMessage());
+		}
+		finally {
+			DB.closeStatement(st);			
 	}
+}
+		
 
 	@Override
 	public void deletarPorId(Integer id) {
-		// TODO Auto-generated method stub
+		
+		PreparedStatement st = null;
+		try {
+			st = conn.prepareStatement("DELETE FROM vendedor WHERE id = ? ");
+			st.setInt(1, id);
+			
+			int del = st.executeUpdate();
+				
+			if (del == 0) {
+				
+				throw new DbException("Não houve alteração no Banco");
+			}
+				
+			
+		}
+		catch (SQLException e) {
+			throw new DbException(e.getMessage());
+		}
+		finally {
+			DB.closeStatement(st);
+		}
 		
 	}
 
