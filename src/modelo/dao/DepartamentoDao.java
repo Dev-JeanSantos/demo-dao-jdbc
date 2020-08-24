@@ -9,7 +9,7 @@ public interface DepartamentoDao {
 	void inserir (Departamento obj);
 	void update (Departamento obj);
 	void deletarPorId (Integer id);
-	void pesquisarPorId (Integer id);
+	Departamento pesquisarPorId (Integer id);
 	List<Departamento> buscarTodos();
 	
 }

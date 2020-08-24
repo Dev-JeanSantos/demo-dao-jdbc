@@ -10,7 +10,7 @@ import modelo.dao.VendedorDao;
 import modelo.entidades.Departamento;
 import modelo.entidades.Vendedor;
 
-public class Programa {
+public class ProgramaVendedor {
 
 	public static void main(String[] args) throws ParseException {
 		
